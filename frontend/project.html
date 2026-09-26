@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Result Portal</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --text: #172033;
+            --muted: #64748b;
+            --border: rgba(148, 163, 184, 0.26);
+            --white: #ffffff;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --glass: rgba(255, 255, 255, 0.72);
+            --soft: #f8fafc;
+            --shadow: 0 25px 70px rgba(15, 23, 42, 0.12);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            min-height: 100vh;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.20), transparent 28%),
+                radial-gradient(circle at 90% 20%, rgba(139, 92, 246, 0.18), transparent 32%),
+                radial-gradient(circle at 60% 100%, rgba(59, 130, 246, 0.12), transparent 32%),
+                linear-gradient(135deg, #f8fafc, #eef2ff 45%, #f5f3ff);
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        body::before,
+        body::after {
+            content: "";
+            position: fixed;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.35;
+            z-index: -1;
+            animation: floatBlob 12s ease-in-out infinite alternate;
+        }
+
+        body::before {
+            background: rgba(99, 102, 241, 0.8);
+            top: -120px;
+            left: -80px;
+        }
+
+        body::after {
+            background: rgba(168, 85, 247, 0.8);
+            bottom: -120px;
+            right: -70px;
+            animation-delay: 3s;
+        }
+
+        @keyframes floatBlob {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(28px, 18px) scale(1.06); }
+            100% { transform: translate(-18px, 40px) scale(0.94); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 920px;
+            margin: auto;
+            animation: pageIn 0.7s ease;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 18px;
+            border-radius: 24px;
+            font-size: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 20px 45px rgba(99, 102, 241, 0.35);
+            position: relative;
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+
+        .logo::after {
+            content: "";
+            position: absolute;
+            inset: -7px;
+            border-radius: 28px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            animation: pulse 2.4s infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.96); opacity: 0; }
+            50% { transform: scale(1.04); opacity: 1; }
+            100% { transform: scale(1.12); opacity: 0; }
+        }
+
+        h1 {
+            font-size: clamp(30px, 5vw, 46px);
+            font-weight: 850;
+            letter-spacing: -1.4px;
+            background: linear-gradient(90deg, #312e81, #6366f1, #8b5cf6);
+            background-size: 200% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientMove 6s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 16px;
+            letter-spacing: 0.2px;
+        }
+
+        .search-box {
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            animation: cardIn 0.7s ease 0.15s backwards;
+        }
+
+        .search-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 30px 80px rgba(79, 70, 229, 0.16);
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        input {
+            flex: 1;
+            height: 56px;
+            padding: 0 18px;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            outline: none;
+            font-size: 15px;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.92);
+            transition: 0.25s ease;
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.12);
+            transform: translateY(-1px);
+        }
+
+        button {
+            height: 56px;
+            padding: 0 28px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.33);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.22s ease, box-shadow 0.22s ease;
+        }
+
+        button::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 70%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: skewX(-20deg);
+            transition: 0.7s ease;
+        }
+
+        button:hover::before {
+            left: 130%;
+        }
+
+        button:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 16px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .student-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: var(--shadow);
+            animation: slideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(22px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .student-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 24px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .student-avatar {
+            width: 68px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #e0e7ff, #ede9fe);
+            font-size: 32px;
+            box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.1);
+            animation: avatarPop 0.5s ease 0.2s backwards;
+        }
+
+        @keyframes avatarPop {
+            from { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+
+        .student-name {
+            font-size: 25px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .student-label {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 28px;
+        }
+
+        .info-item {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            transition: all 0.25s ease;
+            animation: infoIn 0.45s ease 0.25s backwards;
+        }
+
+        .info-item:hover {
+            transform: translateY(-4px);
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.08);
+        }
+
+        @keyframes infoIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--muted);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .info-value {
+            font-weight: 800;
+            font-size: 15px;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .table-wrapper {
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 18px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            color: #475569;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        td {
+            padding: 15px 18px;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease, transform 0.2s ease;
+            animation: rowIn 0.45s ease backwards;
+        }
+
+        tbody tr:nth-child(1) { animation-delay: 0.12s; }
+        tbody tr:nth-child(2) { animation-delay: 0.2s; }
+        tbody tr:nth-child(3) { animation-delay: 0.28s; }
+        tbody tr:nth-child(4) { animation-delay: 0.36s; }
+        tbody tr:nth-child(5) { animation-delay: 0.44s; }
+        tbody tr:nth-child(6) { animation-delay: 0.52s; }
+
+        @keyframes rowIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        tbody tr:hover {
+            background: #f8faff;
+            transform: translateX(4px);
+        }
+
+        .grade {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            padding: 6px 10px;
+            border-radius: 9px;
+            background: #ecfdf5;
+            color: var(--success);
+            font-weight: 800;
+            font-size: 13px;
+            box-shadow: 0 8px 18px rgba(22, 163, 74, 0.12);
+        }
+
+        .not-found, .loading-box {
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            color: var(--danger);
+            padding: 20px;
+            border-radius: 14px;
+            text-align: center;
+            font-weight: 600;
+            animation: slideUp 0.35s ease;
+        }
+
+        .loading-box {
+            color: var(--primary);
+            background: rgba(238, 242, 255, 0.9);
+            border-color: #c7d2fe;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(99, 102, 241, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 25px 15px;
+            }
+
+            .search-box {
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .student-card {
+                padding: 22px;
+            }
+
+            .student-info {
+                grid-template-columns: 1fr;
+            }
+
+            .student-header {
+                align-items: flex-start;
+            }
+
+            .student-name {
+                font-size: 21px;
+            }
+
+            th, td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header class="header">
+
+            <div class="logo">
+                🎓
+            </div>
+
+            <h1>Student Result Portal</h1>
+
+            <p class="subtitle">
+                Search and view your academic results instantly
+            </p>
+
+        </header>
+
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="register_number"
+                placeholder="Enter Register Number"
+                autocomplete="off"
+            >
+
+            <button onclick="searchResult()">
+                🔍 Search Result
+            </button>
+
+        </div>
+
+
+        <div id="result"></div>
+
+
+        <div class="footer">
+            © 2026 Student Result Portal · Academic Management System
+        </div>
+
+    </div>
+
+
+    <script>
+        async function searchResult() {
+            const registerNumber = document.getElementById("register_number").value.trim();
+            const result = document.getElementById("result");
+
+            if (!registerNumber) {
+                result.innerHTML = `
+                    <div class="not-found">
+                        ⚠️ Please enter a register number.
+                    </div>
+                `;
+                return;
+            }
+
+            result.innerHTML = `
+                <div class="loading-box">
+                    <span class="spinner"></span>
+                    <span>Searching for student result...</span>
+                </div>
+            `;
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/results");
+
+                if (!response.ok) {
+                    throw new Error("Server error");
+                }
+
+                const students = await response.json();
+                const student = students.find(item => item.register_number === registerNumber);
+
+                if (student) {
+                    let output = `
+                        <div class="student-card">
+                            <div class="student-header">
+                                <div class="student-avatar">👨‍🎓</div>
+                                <div>
+                                    <div class="student-name">${student.student_name}</div>
+                                    <div class="student-label">Academic Result</div>
+                                </div>
+                            </div>
+
+                            <div class="student-info">
+                                <div class="info-item">
+                                    <span class="info-label">Register Number</span>
+                                    <span class="info-value">${student.register_number}</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Department</span>
+                                    <span class="info-value">${student.department}</span>
+                                </div>
+                            </div>
+
+                            <div class="table-title">📚 Subject Results</div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                    `;
+
+                    student.subjects.forEach(subject => {
+                        output += `
+                            <tr>
+                                <td>${subject.subject_name}</td>
+                                <td><span class="grade">${subject.grade}</span></td>
+                            </tr>
+                        `;
+                    });
+
+                    output += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+
+                    result.innerHTML = output;
+                } else {
+                    result.innerHTML = `
+                        <div class="not-found">
+                            ❌ Student Not Found
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error(error);
+                result.innerHTML = `
+                    <div class="not-found">
+                        ⚠️ Unable to connect to the result server.
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById("register_number").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                searchResult();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
